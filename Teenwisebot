@@ -1,0 +1,78 @@
+import React, { useState } from 'react';
+import { Send, Rocket, Star } from 'lucide-react';
+// import { Home, About, SpaceChatComponent } from './chatbot/chat';
+
+const SpaceChatbot = () => {
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
+
+  const handleSend = () => {
+    if (input.trim()) {
+
+
+      fetch("https://exciting-dodo-18.deno.dev/llama", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",  // Fixed the content type to "application/json"
+        },
+        body: JSON.stringify({
+          "message": "the message goes here"  // Updated body structure
+        })
+      }).then(res => {
+        return res.json();  // Parsing response as JSON
+      }).then(data => {
+        console.log(data);  // Logging the response data
+      }).catch(err => {
+        console.log(err);  // Logging any errors
+      });
+      
+
+
+      setMessages([...messages, { text: input, sender: 'user' }]);
+      setInput('');
+      // Simulate bot response
+      setTimeout(() => {
+        setMessages(prev => [...prev, { text: "Greetings, earthling! I've received your transmission.", sender: 'bot' }]);
+      }, 1000);
+    }
+  };
+
+  return (
+    <div className="flex flex-col h-screen bg-gray-900 text-white p-4">
+      <div className="flex items-center mb-4">
+        <Rocket className="text-blue-400 mr-2" />
+        <h1 className="text-2xl font-bold"> Teen wise Chatbot</h1>
+      </div>
+      
+      <div className="flex-grow overflow-auto mb-4 p-4 bg-gray-800 rounded-lg">
+        {messages.map((message, index) => (
+          <div key={index} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} mb-2`}>
+            <div className={`p-2 rounded-lg ${message.sender === 'user' ? 'bg-blue-600' : 'bg-purple-600'} max-w-xs`}>
+              {message.text}
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      <div className="flex items-center">
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          className="flex-grow p-2 rounded-l-lg bg-gray-700 focus:outline-none"
+          placeholder="Type your message..."
+        />
+        <button onClick={handleSend} className="p-2 bg-blue-500 rounded-r-lg hover:bg-blue-600">
+          <Send className="text-white" />
+        </button>
+      </div>
+      
+      <div className="mt-4 text-center text-sm text-gray-400">
+        <Star className="inline mr-1" size={16} />
+        Powered by llama 3.1 AI
+      </div>
+    </div>
+  );
+};
+
+export default SpaceChatbot;
